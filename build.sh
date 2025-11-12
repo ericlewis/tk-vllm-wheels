@@ -168,6 +168,11 @@ sed -i '/clear_cuda_arches(CUDA_ARCH_FLAGS)/i\  set(CMAKE_CUDA_FLAGS "${CMAKE_CU
 echo "Patching pyproject.toml for setuptools compatibility..."
 sed -i 's/license = {text = "Apache 2.0"}/license = {file = "LICENSE"}/' pyproject.toml
 
+# Patch setup.py to use shlex.split() instead of str.split() for CMAKE_ARGS
+# This preserves quoted arguments with spaces
+echo "Patching setup.py to handle CMAKE_ARGS with spaces..."
+sed -i 's/cmake_args += other_cmake_args.split()/import shlex; cmake_args += shlex.split(other_cmake_args)/' setup.py
+
 echo "All patches applied successfully"
 
 # Clean build directory to avoid cached CMake settings
@@ -177,8 +182,8 @@ rm -rf build/
 
 echo ""
 echo "=== Building wheel (this may take a while) ==="
-# Force sm_121a architecture by patching CMakeLists.txt directly
-# Cannot use CMAKE_ARGS because setup.py calls .split() which breaks flags with spaces
+# Force sm_121a architecture via CMAKE_ARGS (setup.py now patched to use shlex.split())
+export CMAKE_ARGS="-DCMAKE_CUDA_FLAGS='-allow-unsupported-compiler -gencode arch=compute_121a,code=sm_121a'"
 MAX_JOBS=8 python3 -m pip wheel --no-build-isolation --no-deps -w dist .
 
 echo ""
