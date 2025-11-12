@@ -86,13 +86,14 @@ uv pip install \
     regex \
     build
 
-echo ""
-echo "=== Cloning and building Triton (main branch) ==="
-git clone https://github.com/triton-lang/triton.git
-cd triton
-uv pip install -r python/requirements.txt
-uv pip install -e .
-cd "${BUILD_DIR}"
+# Triton build - commented out to avoid rebuilding on subsequent runs
+# echo ""
+# echo "=== Cloning and building Triton (main branch) ==="
+# git clone https://github.com/triton-lang/triton.git
+# cd triton
+# uv pip install -r python/requirements.txt
+# uv pip install -e .
+# cd "${BUILD_DIR}"
 
 echo ""
 echo "=== Cloning vLLM ${VLLM_VERSION} ==="
