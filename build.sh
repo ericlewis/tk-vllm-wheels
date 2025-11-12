@@ -85,7 +85,8 @@ uv pip install \
 echo ""
 echo "=== Cloning and building Triton (main branch) ==="
 git clone https://github.com/triton-lang/triton.git
-cd triton/python
+cd triton
+uv pip install -r python/requirements.txt
 uv pip install -e .
 cd "${BUILD_DIR}"
 
