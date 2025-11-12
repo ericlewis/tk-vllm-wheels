@@ -124,7 +124,7 @@ else
 fi
 
 # Check if Triton is already built
-if [ -d "${BUILD_DIR}/triton" ] && python -c "import triton; assert 'git' in triton.__version__" 2>/dev/null && [ "$FORCE_REBUILD" = false ]; then
+if [ -d "${BUILD_DIR}/triton" ] && python -c "from importlib.metadata import version; assert 'git' in version('triton')" 2>/dev/null && [ "$FORCE_REBUILD" = false ]; then
     echo ""
     echo "=== Triton already built and installed, skipping (use --force to rebuild) ==="
 else
