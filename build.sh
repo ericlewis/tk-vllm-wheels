@@ -73,7 +73,8 @@ echo "=== Installing PyTorch 2.9.0 (pinned version for vLLM 0.11.1rc5) ==="
 uv pip install \
     torch==2.9.0 \
     torchvision==0.24.0 \
-    torchaudio==2.9.0
+    torchaudio==2.9.0 \
+    --index-url https://download.pytorch.org/whl/cu130
 
 echo ""
 echo "=== Installing build dependencies ==="
