@@ -47,8 +47,13 @@ sudo apt-get install -y --no-install-recommends \
     wget \
     curl
 
-# Upgrade pip
-python3.12 -m pip install --upgrade pip setuptools wheel
+# Create virtual environment for clean build
+echo "Creating virtual environment..."
+python3.12 -m venv ${BUILD_DIR}/venv
+source ${BUILD_DIR}/venv/bin/activate
+
+# Upgrade pip in venv
+pip install --upgrade pip setuptools wheel
 
 # Set environment variables
 export CUDA_HOME=/usr/local/cuda-13.0
@@ -59,7 +64,7 @@ export TORCH_CUDA_ARCH_LIST="12.1a"
 
 echo ""
 echo "=== Installing PyTorch ==="
-pip3 install --no-cache-dir \
+pip install --no-cache-dir \
     torch==2.5.1 \
     torchvision==0.20.1 \
     --index-url https://download.pytorch.org/whl/cu121
@@ -68,7 +73,7 @@ echo ""
 echo "=== Cloning and building Triton (main branch) ==="
 git clone https://github.com/triton-lang/triton.git
 cd triton/python
-pip3 install --no-cache-dir -e .
+pip install --no-cache-dir -e .
 cd "${BUILD_DIR}"
 
 echo ""
