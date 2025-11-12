@@ -77,6 +77,11 @@ else
 fi
 source ${BUILD_DIR}/venv/bin/activate
 
+# Install pip in the venv so we can use 'python -m pip wheel' which respects CMAKE_ARGS
+echo ""
+echo "=== Installing pip in venv ==="
+uv pip install pip
+
 # Set environment variables
 export CUDA_HOME=/usr/local/cuda-13.0
 export PATH="${CUDA_HOME}/bin:${PATH}"
@@ -159,9 +164,19 @@ sed -i 's/license = {text = "Apache 2.0"}/license = {file = "LICENSE"}/' pyproje
 
 echo "All patches applied successfully"
 
+# Clean build directory to avoid cached CMake settings
+echo ""
+echo "=== Cleaning build directory ==="
+rm -rf build/
+
 echo ""
 echo "=== Building wheel (this may take a while) ==="
-MAX_JOBS=8 python3 setup.py bdist_wheel
+# Force sm_121a architecture for DGX Spark GB10
+# vLLM's CMakeLists.txt extracts CUDA archs from CMAKE_CUDA_FLAGS -gencode flags
+# NOT from CMAKE_CUDA_ARCHITECTURES! (see CMakeLists.txt line 148-149)
+# Must add -gencode arch=compute_121a,code=sm_121a to CMAKE_CUDA_FLAGS
+export CMAKE_ARGS="-DCMAKE_CUDA_FLAGS='-allow-unsupported-compiler -gencode arch=compute_121a,code=sm_121a'"
+MAX_JOBS=8 python3 -m pip wheel --no-build-isolation --no-deps -w dist .
 
 echo ""
 echo "=== Wheel built successfully! ==="
