@@ -158,6 +158,12 @@ echo "=== Applying Thinkube patches for Blackwell sm_121a support ==="
 echo "Patching CMakeLists.txt for Blackwell sm_121a support..."
 sed -i -f "${SCRIPT_DIR}/patches/blackwell.sed" CMakeLists.txt
 
+# Add -gencode flags to CMAKE_CUDA_FLAGS for sm_121a
+# Must do this because setup.py splits CMAKE_ARGS on whitespace, breaking flags with spaces
+# Insert BEFORE clear_cuda_arches() which extracts the flags
+echo "Adding -gencode arch=compute_121a,code=sm_121a to CMAKE_CUDA_FLAGS..."
+sed -i '/clear_cuda_arches(CUDA_ARCH_FLAGS)/i\  set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -gencode arch=compute_121a,code=sm_121a")' CMakeLists.txt
+
 # Fix pyproject.toml license field
 echo "Patching pyproject.toml for setuptools compatibility..."
 sed -i 's/license = {text = "Apache 2.0"}/license = {file = "LICENSE"}/' pyproject.toml
@@ -171,12 +177,8 @@ rm -rf build/
 
 echo ""
 echo "=== Building wheel (this may take a while) ==="
-# Force sm_121a architecture for DGX Spark GB10
-# vLLM's CMakeLists.txt extracts CUDA archs from CMAKE_CUDA_FLAGS -gencode flags
-# NOT from CMAKE_CUDA_ARCHITECTURES! (see CMakeLists.txt line 148-149)
-# Must add -gencode arch=compute_121a,code=sm_121a to CMAKE_CUDA_FLAGS
-# Use escaped quotes so the flags are passed as a single value to CMake
-export CMAKE_ARGS="-DCMAKE_CUDA_FLAGS=\"-allow-unsupported-compiler -gencode arch=compute_121a,code=sm_121a\""
+# Force sm_121a architecture by patching CMakeLists.txt directly
+# Cannot use CMAKE_ARGS because setup.py calls .split() which breaks flags with spaces
 MAX_JOBS=8 python3 -m pip wheel --no-build-isolation --no-deps -w dist .
 
 echo ""
