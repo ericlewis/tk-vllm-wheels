@@ -89,14 +89,13 @@ uv pip install \
     regex \
     build
 
-# Triton build - commented out to avoid rebuilding on subsequent runs
-# echo ""
-# echo "=== Cloning and building Triton (main branch) ==="
-# git clone https://github.com/triton-lang/triton.git
-# cd triton
-# uv pip install -r python/requirements.txt
-# uv pip install -e .
-# cd "${BUILD_DIR}"
+echo ""
+echo "=== Cloning and building Triton (main branch) ==="
+git clone https://github.com/triton-lang/triton.git
+cd triton
+uv pip install -r python/requirements.txt
+uv pip install -e .
+cd "${BUILD_DIR}"
 
 echo ""
 echo "=== Cloning vLLM ${VLLM_VERSION} ==="
@@ -125,14 +124,6 @@ else
     sed -i 's/license = {text = "Apache 2.0"}/license = {file = "LICENSE"}/' pyproject.toml
 fi
 
-if [ -f "${SCRIPT_DIR}/patches/setup.patch" ]; then
-    echo "Applying setup.py patch..."
-    patch -p1 < "${SCRIPT_DIR}/patches/setup.patch"
-else
-    echo "Using sed for setup.py..."
-    sed -i 's/name="vllm"/name="tk-vllm"/' setup.py
-fi
-
 echo ""
 echo "=== Building wheel (this may take a while) ==="
 MAX_JOBS=8 python3 setup.py bdist_wheel
@@ -143,9 +134,9 @@ ls -lh dist/
 
 # Generate checksum
 cd dist
-sha256sum tk_vllm-*.whl > checksums.txt
+sha256sum vllm-*.whl > checksums.txt
 
-WHEEL_FILE=$(ls tk_vllm-*.whl)
+WHEEL_FILE=$(ls vllm-*.whl)
 
 echo ""
 echo "=== Build complete! ==="
