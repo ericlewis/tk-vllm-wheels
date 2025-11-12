@@ -32,9 +32,9 @@ fi
 mkdir -p "${BUILD_DIR}"
 cd "${BUILD_DIR}"
 
-# Install build dependencies
+# Install system dependencies
 echo ""
-echo "=== Installing build dependencies ==="
+echo "=== Installing system dependencies ==="
 sudo apt-get update
 sudo apt-get install -y --no-install-recommends \
     python3.12 \
@@ -47,13 +47,17 @@ sudo apt-get install -y --no-install-recommends \
     wget \
     curl
 
-# Create virtual environment for clean build
-echo "Creating virtual environment..."
-python3.12 -m venv ${BUILD_DIR}/venv
-source ${BUILD_DIR}/venv/bin/activate
+# Install uv for better dependency management
+echo ""
+echo "=== Installing uv ==="
+curl -LsSf https://astral.sh/uv/install.sh | sh
+export PATH="$HOME/.local/bin:$PATH"
 
-# Upgrade pip in venv
-pip install --upgrade pip setuptools wheel
+# Create virtual environment
+echo ""
+echo "=== Creating virtual environment ==="
+uv venv --python 3.12 ${BUILD_DIR}/venv
+source ${BUILD_DIR}/venv/bin/activate
 
 # Set environment variables
 export CUDA_HOME=/usr/local/cuda-13.0
@@ -63,17 +67,26 @@ export TRITON_PTXAS_PATH="${CUDA_HOME}/bin/ptxas"
 export TORCH_CUDA_ARCH_LIST="12.1a"
 
 echo ""
-echo "=== Installing PyTorch ==="
-pip install --no-cache-dir \
-    torch==2.5.1 \
-    torchvision==0.20.1 \
-    --index-url https://download.pytorch.org/whl/cu121
+echo "=== Installing PyTorch 2.9.0 (pinned version for vLLM 0.11.1rc5) ==="
+uv pip install \
+    torch==2.9.0 \
+    torchvision==0.24.0 \
+    torchaudio==2.9.0
+
+echo ""
+echo "=== Installing build dependencies ==="
+uv pip install \
+    cmake>=3.26.1 \
+    ninja \
+    packaging>=24.2 \
+    wheel \
+    setuptools>=77.0.3,<80.0.0
 
 echo ""
 echo "=== Cloning and building Triton (main branch) ==="
 git clone https://github.com/triton-lang/triton.git
 cd triton/python
-pip install --no-cache-dir -e .
+uv pip install -e .
 cd "${BUILD_DIR}"
 
 echo ""
