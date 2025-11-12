@@ -44,6 +44,7 @@ sudo apt-get install -y --no-install-recommends \
     git \
     build-essential \
     ninja-build \
+    scons \
     wget \
     curl
 
@@ -65,6 +66,7 @@ export PATH="${CUDA_HOME}/bin:${PATH}"
 export LD_LIBRARY_PATH="${CUDA_HOME}/lib64:${LD_LIBRARY_PATH}"
 export TRITON_PTXAS_PATH="${CUDA_HOME}/bin/ptxas"
 export TORCH_CUDA_ARCH_LIST="12.1a"
+export VLLM_TARGET_DEVICE=cuda
 
 echo ""
 echo "=== Installing PyTorch 2.9.0 (pinned version for vLLM 0.11.1rc5) ==="
