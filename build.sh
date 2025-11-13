@@ -173,6 +173,12 @@ sed -i 's/license = {text = "Apache 2.0"}/license = {file = "LICENSE"}/' pyproje
 echo "Patching setup.py to handle CMAKE_ARGS with spaces..."
 sed -i 's/cmake_args += other_cmake_args.split()/import shlex; cmake_args += shlex.split(other_cmake_args)/' setup.py
 
+# Patch cmake/utils.cmake string_to_ver() to preserve architecture suffix ('a' for Ada/Blackwell)
+# Original regex loses suffix: "121a" -> "12.1" (missing 'a')
+# Fixed regex preserves suffix: "121a" -> "12.1a"
+echo "Patching cmake/utils.cmake to preserve architecture suffix..."
+sed -i 's/"([0-9]+)([0-9])" "\\\\1\\.\\\\2"/"([0-9]+)([0-9])([a-z]?)" "\\\\1.\\\\2\\\\3"/' cmake/utils.cmake
+
 echo "All patches applied successfully"
 
 # Clean build directory to avoid cached CMake settings
