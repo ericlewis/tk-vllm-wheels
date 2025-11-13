@@ -177,7 +177,16 @@ sed -i 's/cmake_args += other_cmake_args.split()/import shlex; cmake_args += shl
 # Original regex loses suffix: "121a" -> "12.1" (missing 'a')
 # Fixed regex preserves suffix: "121a" -> "12.1a"
 echo "Patching cmake/utils.cmake to preserve architecture suffix..."
-sed -i 's/"([0-9]+)([0-9])" "\\\\1\\.\\\\2"/"([0-9]+)([0-9])([a-z]?)" "\\\\1.\\\\2\\\\3"/' cmake/utils.cmake
+cat > /tmp/string_to_ver_fix.txt << 'ENDPATCH'
+macro(string_to_ver OUT_VER IN_STR)
+  string(REGEX REPLACE "([0-9]+)([0-9])([a-z]?)" "\\1.\\2\\3" ${OUT_VER} ${IN_STR})
+endmacro()
+ENDPATCH
+# Replace the function (match from "macro(string_to_ver" to "endmacro()")
+sed -i '/^macro(string_to_ver/,/^endmacro()/{
+  /^macro(string_to_ver/r /tmp/string_to_ver_fix.txt
+  d
+}' cmake/utils.cmake
 
 echo "All patches applied successfully"
 
