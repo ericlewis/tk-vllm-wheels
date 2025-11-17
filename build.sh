@@ -155,14 +155,6 @@ echo ""
 echo "=== Applying Blackwell patches for DGX Spark GB10 ==="
 echo "Source: NVIDIA Forum - https://forums.developer.nvidia.com/t/run-vllm-in-spark/348862"
 
-# Apply NVIDIA's proven patch using git apply
-# echo "Applying Blackwell CMakeLists.txt patch..."
-# git apply "${SCRIPT_DIR}/patches/blackwell.patch"
-
-# Add -gencode flags to CMAKE_CUDA_FLAGS for sm_121a
-echo "Adding -gencode arch=compute_121a,code=sm_121a to CMAKE_CUDA_FLAGS..."
-sed -i '/clear_cuda_arches(CUDA_ARCH_FLAGS)/i\  set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -gencode arch=compute_121a,code=sm_121a")' CMakeLists.txt
-
 # Fix pyproject.toml license field
 echo "Patching pyproject.toml for setuptools compatibility..."
 sed -i 's/license = {text = "Apache 2.0"}/license = {file = "LICENSE"}/' pyproject.toml
@@ -180,7 +172,7 @@ rm -rf build/
 
 echo ""
 echo "=== Building wheel (this may take a while) ==="
-export CMAKE_ARGS="-DCMAKE_CUDA_FLAGS='-allow-unsupported-compiler' -gencode arch=compute_121a,code=sm_121a'"
+export CMAKE_ARGS="-DCMAKE_CUDA_FLAGS='-allow-unsupported-compiler'"
 export NINJAFLAGS="-v"
 export NINJA_FLAGS="-v"
 export CMAKE_BUILD_PARALLEL_LEVEL=18
