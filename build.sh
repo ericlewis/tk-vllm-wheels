@@ -89,7 +89,6 @@ export LD_LIBRARY_PATH="${CUDA_HOME}/lib64:${LD_LIBRARY_PATH}"
 export TRITON_PTXAS_PATH="${CUDA_HOME}/bin/ptxas"
 export TORCH_CUDA_ARCH_LIST="10.0f;11.0f;12.0f"
 export VLLM_TARGET_DEVICE=cuda
-export CMAKE_ARGS="-DCMAKE_CUDA_FLAGS='-allow-unsupported-compiler'"
 
 # Check if PyTorch is already installed
 if python -c "import torch; assert torch.__version__ == '2.9.0+cu130'" 2>/dev/null && [ "$FORCE_REBUILD" = false ]; then
