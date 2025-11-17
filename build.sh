@@ -42,8 +42,8 @@ cd "${BUILD_DIR}"
 # Install system dependencies
 echo ""
 echo "=== Installing system dependencies ==="
-sudo apt-get update
-sudo apt-get install -y --no-install-recommends \
+apt-get update
+apt-get install -y --no-install-recommends \
     python3.12 \
     python3.12-dev \
     python3.12-venv \
