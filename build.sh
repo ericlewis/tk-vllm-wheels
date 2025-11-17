@@ -7,7 +7,7 @@
 
 set -e
 
-VLLM_VERSION="v0.11.1rc5"
+VLLM_VERSION="main"
 BUILD_DIR="/tmp/tk-vllm-build"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -87,7 +87,7 @@ export CUDA_HOME=/usr/local/cuda-13.0
 export PATH="${CUDA_HOME}/bin:${PATH}"
 export LD_LIBRARY_PATH="${CUDA_HOME}/lib64:${LD_LIBRARY_PATH}"
 export TRITON_PTXAS_PATH="${CUDA_HOME}/bin/ptxas"
-export TORCH_CUDA_ARCH_LIST="12.1a"
+export TORCH_CUDA_ARCH_LIST="12.0f"
 export VLLM_TARGET_DEVICE=cuda
 
 # Check if PyTorch is already installed
@@ -156,12 +156,12 @@ echo "=== Applying Blackwell patches for DGX Spark GB10 ==="
 echo "Source: NVIDIA Forum - https://forums.developer.nvidia.com/t/run-vllm-in-spark/348862"
 
 # Apply NVIDIA's proven patch using git apply
-echo "Applying Blackwell CMakeLists.txt patch..."
-git apply "${SCRIPT_DIR}/patches/blackwell.patch"
+# echo "Applying Blackwell CMakeLists.txt patch..."
+# git apply "${SCRIPT_DIR}/patches/blackwell.patch"
 
 # Add -gencode flags to CMAKE_CUDA_FLAGS for sm_121a
-echo "Adding -gencode arch=compute_121a,code=sm_121a to CMAKE_CUDA_FLAGS..."
-sed -i '/clear_cuda_arches(CUDA_ARCH_FLAGS)/i\  set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -gencode arch=compute_121a,code=sm_121a")' CMakeLists.txt
+# echo "Adding -gencode arch=compute_121a,code=sm_121a to CMAKE_CUDA_FLAGS..."
+# sed -i '/clear_cuda_arches(CUDA_ARCH_FLAGS)/i\  set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -gencode arch=compute_121a,code=sm_121a")' CMakeLists.txt
 
 # Fix pyproject.toml license field
 echo "Patching pyproject.toml for setuptools compatibility..."
@@ -181,8 +181,8 @@ rm -rf build/
 echo ""
 echo "=== Building wheel (this may take a while) ==="
 # Force sm_121a architecture via CMAKE_ARGS (setup.py now patched to use shlex.split())
-export CMAKE_ARGS="-DCMAKE_CUDA_FLAGS='-allow-unsupported-compiler -gencode arch=compute_121a,code=sm_121a'"
-MAX_JOBS=8 python3 -m pip wheel --no-build-isolation --no-deps -w dist .
+export CMAKE_ARGS="-DCMAKE_CUDA_FLAGS='-allow-unsupported-compiler'"
+MAX_JOBS=14 python3 -m pip wheel --no-build-isolation --no-deps -w dist .
 
 echo ""
 echo "=== Wheel built successfully! ==="
