@@ -181,11 +181,11 @@ rm -rf build/
 echo ""
 echo "=== Building wheel (this may take a while) ==="
 # Force sm_121a architecture via CMAKE_ARGS (setup.py now patched to use shlex.split())
-export CMAKE_ARGS="-DCMAKE_CUDA_FLAGS='-allow-unsupported-compiler' -DCMAKE_VERBOSE_MAKEFILE=ON"
+export CMAKE_ARGS="-DCMAKE_CUDA_FLAGS='-allow-unsupported-compiler'"
 export NINJAFLAGS="-v"
 export NINJA_FLAGS="-v"
-export CMAKE_BUILD_PARALLEL_LEVEL=14
-MAX_JOBS=14 python3 -m pip wheel -vvv --no-build-isolation --no-deps -w dist .
+export CMAKE_BUILD_PARALLEL_LEVEL=18
+MAX_JOBS=18 python3 -m pip wheel --no-build-isolation --no-deps -w dist .
 
 echo ""
 echo "=== Wheel built successfully! ==="
@@ -204,4 +204,4 @@ echo "Checksum: ${BUILD_DIR}/vllm/dist/checksums.txt"
 echo ""
 echo "Next step:"
 echo "  cd ${BUILD_DIR}/vllm/dist"
-echo "  gh release create ${VLLM_VERSION} --repo thinkube/tk-vllm-wheels --title 'tk-vllm ${VLLM_VERSION}' --notes 'tk-vllm for DGX Spark GB10 (ARM64)' ${WHEEL_FILE} checksums.txt"
+echo "  gh release create ${VLLM_VERSION} --repo ericlewis/tk-vllm-wheels --title 'tk-vllm ${VLLM_VERSION}' --notes 'vllm for DGX Spark GB10 (ARM64)' ${WHEEL_FILE} checksums.txt"
